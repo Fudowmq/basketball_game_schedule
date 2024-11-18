@@ -1,7 +1,11 @@
+import 'package:basketball_game_schedule/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'database/database_helper.dart';
+import 'database/user.dart';
+import 'profile.dart';
 
-void main() async{
+void main() async {
   runApp(const BasketballGameSchedule());
 }
 
@@ -13,7 +17,12 @@ class BasketballGameSchedule extends StatelessWidget {
     return MaterialApp(
       title: 'Basketball Game Schedule',
       theme: ThemeData(),
-      home: const MyHomePage(title: ''),
+      initialRoute: '/', 
+      routes: {
+        '/': (context) => const MyHomePage(title: ''), // Страница входа
+        '/home': (context) => const HomePage(title: ''), // Главная страница
+        '/profile': (context) => const ProfilePage(), // Страница профиля
+      },
     );
   }
 }
@@ -28,6 +37,48 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final DatabaseHelper dbHelper = DatabaseHelper.instance;
+
+  Future<void> _registerUser() async {
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (username.isNotEmpty && password.isNotEmpty) {
+      User? existingUser = await dbHelper.getUser(username);
+      if (existingUser == null) {
+        await dbHelper.addUser(User(username: username, password: password));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Аккаунт успешно создан")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Пользователь уже существует")),
+        );
+      }
+    }
+  }
+
+  Future<void> _loginUser() async {
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (username.isNotEmpty && password.isNotEmpty) {
+      User? user = await dbHelper.getUser(username);
+      if (user != null && user.password == password) {
+        Navigator.pushReplacementNamed(
+          context,
+          '/home', // Навигация на главную страницу
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Неверное имя пользователя или пароль")),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
             right: 0,
             child: SvgPicture.asset(
               'assets/images/blueLine.svg',
-              color: Colors.blue,),
+              color: Colors.blue,
+            ),
           ),
           Center(
             child: Column(
@@ -75,9 +127,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
+                        controller: _usernameController,
                         decoration: InputDecoration(
                           labelText: 'Username',
-                          suffixIcon :
+                          suffixIcon:
                               const Icon(Icons.person, color: Colors.white54),
                           filled: true,
                           fillColor: Colors.white.withOpacity(0.1),
@@ -90,10 +143,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       const SizedBox(height: 15),
                       TextField(
+                        controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          suffixIcon :
+                          suffixIcon:
                               const Icon(Icons.lock, color: Colors.white54),
                           filled: true,
                           fillColor: Colors.white.withOpacity(0.1),
@@ -104,49 +158,25 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         style: const TextStyle(color: Colors.white),
                       ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: true,
-                                onChanged: (value) {},
-                                activeColor: Colors.blue,
-                              ),
-                              const Text(
-                                'Remember me',
-                                style: TextStyle(color: Colors.white54),
-                              ),
-                            ],
-                          ),
-                          const Text(
-                            'Forgot Password?',
-                            style: TextStyle(color: Colors.white54),
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: _loginUser,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 36, 40, 58),
+                              backgroundColor:
+                                  const Color.fromARGB(255, 36, 40, 58),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 30, vertical: 11),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
                             ),
-                            child: const Text(
-                              'LOGIN',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            child: const Text('LOGIN',
+                                style: TextStyle(color: Colors.white)),
                           ),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: _registerUser,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueAccent,
                               padding: const EdgeInsets.symmetric(
@@ -154,10 +184,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
                             ),
-                            child: const Text(
-                              'SIGN UP',
-                                style: TextStyle(color: Colors.white),
-                            ),
+                            child: const Text('SIGN UP',
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ],
                       ),
