@@ -1,3 +1,5 @@
+import 'package:basketball_game_schedule/games.dart';
+import 'package:basketball_game_schedule/playoff.dart';
 import 'package:basketball_game_schedule/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,8 +12,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        splashFactory: NoSplash.splashFactory, // Убираем вспышки
-        highlightColor: Colors.transparent, // Убираем выделение
+        splashFactory: NoSplash.splashFactory, 
+        highlightColor: Colors.transparent, 
       ),
       home: const HomePage(title: 'Basketball Highlights'),
     );
@@ -24,6 +26,7 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomePageState createState() => _HomePageState();
 }
 
@@ -37,32 +40,39 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void playVideo(String videoPath) {
-    // Инициализируем VideoPlayerController и показываем видео
-    _videoPlayerController = VideoPlayerController.asset(videoPath)
-      ..initialize().then((_) {
-        setState(() {
-          _videoPlayerController!.play();
-        });
-        showDialog(
-          context: context,
-          barrierDismissible: true, // Закрытие по нажатию вне видео
-          builder: (context) {
-            return Dialog(
-              insetPadding: EdgeInsets.zero, // Без отступов
-              backgroundColor: Colors.black,
-              child: AspectRatio(
-                aspectRatio: _videoPlayerController!.value.aspectRatio,
-                child: VideoPlayer(_videoPlayerController!),
-              ),
-            );
-          },
-        ).then((_) {
-          // Останавливаем видео при закрытии диалога
-          _videoPlayerController!.pause();
-        });
-      });
+void playVideo(String videoPath) {
+  // Останавливаем текущее видео, если оно воспроизводится
+  if (_videoPlayerController != null && _videoPlayerController!.value.isPlaying) {
+    _videoPlayerController!.pause();
   }
+
+  // Инициализируем и запускаем новое видео
+  _videoPlayerController = VideoPlayerController.asset(videoPath)
+    ..initialize().then((_) {
+      setState(() {
+        _videoPlayerController!.play();
+      });
+      showDialog(
+        // ignore: use_build_context_synchronously
+        context: context,
+        barrierDismissible: true, // Закрытие диалога при нажатии за его пределами
+        builder: (context) {
+          return Dialog(
+            insetPadding: EdgeInsets.zero, // Без отступов
+            backgroundColor: Colors.black,
+            child: AspectRatio(
+              aspectRatio: _videoPlayerController!.value.aspectRatio,
+              child: VideoPlayer(_videoPlayerController!),
+            ),
+          );
+        },
+      ).then((_) {
+        // Ставим видео на паузу при закрытии диалога
+        _videoPlayerController!.pause();
+      });
+    });
+}
+
 
   Widget getImage(String imagePath) {
     if (imagePath.endsWith('.svg')) {
@@ -254,26 +264,29 @@ class _HomePageState extends State<HomePage> {
                 _currentIndex = index;
               });
 
-              // Переход на страницу профиля при выборе второго элемента
-              if (index == 1) {
+              if (index == 0) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomePage(title: ''),
+                  ),
+                );
+              } else if(index == 1) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const ProfilePage()),
                 );
-              }
-
-              // Если другие индексы, переходите на другие страницы
-              // Например, index == 0 для главной страницы
-              if (index == 0) {
-                // Переход на главную страницу
-                Navigator.pushReplacement(
+              } else if(index == 2) {
+                Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const HomePage(title: 'Basketball Highlights')),
+                  MaterialPageRoute(builder: (context) => const GamesPage()),
+                );
+              } else if(index == 3) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PlayoffPage()),
                 );
               }
-              // Можно добавить больше условий для других страниц, если нужно
             },
             selectedItemColor: Colors.white,
             unselectedItemColor: Colors.grey,
@@ -330,5 +343,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-void main() => runApp(MyApp());

@@ -1,9 +1,12 @@
+import 'package:basketball_game_schedule/games.dart';
 import 'package:basketball_game_schedule/home_page.dart';
+import 'package:basketball_game_schedule/playoff.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'database/database_helper.dart';
 import 'database/user.dart';
 import 'profile.dart';
+
 
 void main() async {
   runApp(const BasketballGameSchedule());
@@ -19,9 +22,11 @@ class BasketballGameSchedule extends StatelessWidget {
       theme: ThemeData(),
       initialRoute: '/', 
       routes: {
-        '/': (context) => const MyHomePage(title: ''), // Страница входа
-        '/home': (context) => const HomePage(title: ''), // Главная страница
-        '/profile': (context) => const ProfilePage(), // Страница профиля
+        '/': (context) => const MyHomePage(title: ''), 
+        '/home': (context) => const HomePage(title: ''),
+        '/profile': (context) => const ProfilePage(), 
+        '/games': (context) => const GamesPage(),
+        '/playoff': (context) => const PlayoffPage(),
       },
     );
   }
@@ -49,10 +54,12 @@ class _MyHomePageState extends State<MyHomePage> {
       User? existingUser = await dbHelper.getUser(username);
       if (existingUser == null) {
         await dbHelper.addUser(User(username: username, password: password));
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Аккаунт успешно создан")),
         );
       } else {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Пользователь уже существует")),
         );
@@ -68,10 +75,12 @@ class _MyHomePageState extends State<MyHomePage> {
       User? user = await dbHelper.getUser(username);
       if (user != null && user.password == password) {
         Navigator.pushReplacementNamed(
+          // ignore: use_build_context_synchronously
           context,
           '/home', // Навигация на главную страницу
         );
       } else {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Неверное имя пользователя или пароль")),
         );
