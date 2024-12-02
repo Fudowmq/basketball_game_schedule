@@ -2,11 +2,9 @@ import 'package:basketball_game_schedule/games.dart';
 import 'package:basketball_game_schedule/home_page.dart';
 import 'package:basketball_game_schedule/playoff.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'database/database_helper.dart';
 import 'database/user.dart';
 import 'profile.dart';
-
 
 void main() async {
   runApp(const BasketballGameSchedule());
@@ -20,11 +18,11 @@ class BasketballGameSchedule extends StatelessWidget {
     return MaterialApp(
       title: 'Basketball Game Schedule',
       theme: ThemeData(),
-      initialRoute: '/', 
+      initialRoute: '/',
       routes: {
-        '/': (context) => const MyHomePage(title: ''), 
+        '/': (context) => const MyHomePage(title: ''),
         '/home': (context) => const HomePage(title: ''),
-        '/profile': (context) => const ProfilePage(), 
+        '/profile': (context) => const ProfilePage(),
         '/games': (context) => const GamesPage(),
         '/playoff': (context) => const PlayoffPage(),
       },
@@ -101,14 +99,13 @@ class _MyHomePageState extends State<MyHomePage> {
           Positioned(
             top: MediaQuery.of(context).size.height * 0.0005,
             left: MediaQuery.of(context).size.width * 0.001,
-            child: SvgPicture.asset('assets/images/logo.svg'),
+            child: Image.asset('assets/images/logo.png'),
           ),
           Positioned(
             top: MediaQuery.of(context).size.height * 0.1,
             right: 0,
-            child: SvgPicture.asset(
-              'assets/images/blueLine.svg',
-              color: Colors.blue,
+            child: Image.asset(
+              'assets/images/blue_line.png',
             ),
           ),
           Center(

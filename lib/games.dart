@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class GamesPage extends StatefulWidget {
   const GamesPage({super.key});
@@ -20,18 +19,20 @@ class _GamesPageState extends State<GamesPage> {
       {
         'homeTeam': 'Lakers',
         'awayTeam': 'Spurs',
-        'homeScore': 95,
-        'awayScore': 117,
+        'homeScore': 123,
+        'awayScore': 103,
         'homeLogoPath': 'assets/images/lakers.png',
         'awayLogoPath': 'assets/images/spurs.png',
       },
+    ],
+    'Yesterday': [
       {
-        'homeTeam': 'Memphis',
-        'awayTeam': 'Minnesota',
+        'homeTeam': 'Bucks',
+        'awayTeam': 'Mavericks',
         'homeScore': 95,
-        'awayScore': 120,
-        'homeLogoPath': 'assets/images/memphis.png',
-        'awayLogoPath': 'assets/images/minnesota.png',
+        'awayScore': 117,
+        'homeLogoPath': 'assets/images/bucks.png',
+        'awayLogoPath': 'assets/images/mavericks.png',
       },
     ],
     'Today': [
@@ -48,11 +49,18 @@ class _GamesPageState extends State<GamesPage> {
         'awayTeam': 'Raptors',
         'homeScore': 118,
         'awayScore': 104,
-        'homeLogoPath': 'assets/images/warriors.png',
+        'homeLogoPath': 'assets/images/warrior.png',
         'awayLogoPath': 'assets/images/raptors.png',
       },
+      {
+        'homeTeam': 'Memphis',
+        'awayTeam': 'Minnesota',
+        'homeScore': 95,
+        'awayScore': 120,
+        'homeLogoPath': 'assets/images/memphis.png',
+        'awayLogoPath': 'assets/images/minnesota.png',
+      },
     ],
-    // Добавьте другие дни с играми здесь, если нужно
   };
 
   @override
@@ -294,34 +302,42 @@ class _GamesPageState extends State<GamesPage> {
         iconSize: 28,
         items: [
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/home_icon.svg',
-              height: 30,
-              color: _currentIndex == 0 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/home_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/icon_user.svg',
-              height: 30,
-              color: _currentIndex == 1 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/people_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/icon_ticket.svg',
-              height: 30,
-              color: _currentIndex == 2 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/score_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/icon_playoff.svg',
-              height: 30,
-              color: _currentIndex == 3 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/playoff_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),

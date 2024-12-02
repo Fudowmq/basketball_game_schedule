@@ -1,9 +1,0 @@
-<svg width="360" height="667" viewBox="0 0 360 667" xmlns="http://www.w3.org/2000/svg">
-  <path d="M243.542 189.024L326.375 16.5721L399.242 87.9184L351.784 887.093L-60.6015 853.029C58.174 593.719 124.767 448.334 243.542 189.024Z" fill="00BFFF" />
-  <defs>
-    <linearGradient id="paint0_linear_27_2" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
-      <stop offset="0%" stop-color="#37B6E9" /> <!-- Начальный голубой -->
-      <stop offset="100%" stop-color="#1E90FF" /> <!-- Более темный голубой -->
-    </linearGradient>
-  </defs>
-</svg>

@@ -12,13 +12,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        splashFactory: NoSplash.splashFactory, 
-        highlightColor: Colors.transparent, 
+        splashFactory: NoSplash.splashFactory,
+        highlightColor: Colors.transparent,
       ),
-      home: const HomePage(title: 'Basketball Highlights'),
+      home: const HomePage(title: ''),
     );
   }
 }
+
+final List<String> hotNewsImages = [
+  'assets/images/lebron_hotnews.png',
+  'assets/images/ja.jpg',
+  'assets/images/steph_carry_hotnews.jpg',
+];
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -33,46 +39,49 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   VideoPlayerController? _videoPlayerController;
   int _currentIndex = 0; // Для отслеживания текущего индекса
+  int _currentHotNewsIndex = 0; // Для отслеживания текущего изображения
+  final PageController _pageController =
+      PageController(); // Контроллер для PageView
 
   @override
   void dispose() {
     _videoPlayerController?.dispose();
+    _pageController.dispose(); // Освобождаем ресурсы PageController
     super.dispose();
   }
 
-void playVideo(String videoPath) {
-  // Останавливаем текущее видео, если оно воспроизводится
-  if (_videoPlayerController != null && _videoPlayerController!.value.isPlaying) {
-    _videoPlayerController!.pause();
+  void playVideo(String videoPath) {
+    // Останавливаем текущее видео, если оно воспроизводится
+    if (_videoPlayerController != null &&
+        _videoPlayerController!.value.isPlaying) {
+      _videoPlayerController!.pause();
+    }
+
+    // Инициализируем и запускаем новое видео
+    _videoPlayerController = VideoPlayerController.asset(videoPath)
+      ..initialize().then((_) {
+        setState(() {
+          _videoPlayerController!.play();
+        });
+        showDialog(
+          // ignore: use_build_context_synchronously
+          context: context,
+          barrierDismissible: true,
+          builder: (context) {
+            return Dialog(
+              insetPadding: EdgeInsets.zero,
+              backgroundColor: Colors.black,
+              child: AspectRatio(
+                aspectRatio: _videoPlayerController!.value.aspectRatio,
+                child: VideoPlayer(_videoPlayerController!),
+              ),
+            );
+          },
+        ).then((_) {
+          _videoPlayerController!.pause();
+        });
+      });
   }
-
-  // Инициализируем и запускаем новое видео
-  _videoPlayerController = VideoPlayerController.asset(videoPath)
-    ..initialize().then((_) {
-      setState(() {
-        _videoPlayerController!.play();
-      });
-      showDialog(
-        // ignore: use_build_context_synchronously
-        context: context,
-        barrierDismissible: true, // Закрытие диалога при нажатии за его пределами
-        builder: (context) {
-          return Dialog(
-            insetPadding: EdgeInsets.zero, // Без отступов
-            backgroundColor: Colors.black,
-            child: AspectRatio(
-              aspectRatio: _videoPlayerController!.value.aspectRatio,
-              child: VideoPlayer(_videoPlayerController!),
-            ),
-          );
-        },
-      ).then((_) {
-        // Ставим видео на паузу при закрытии диалога
-        _videoPlayerController!.pause();
-      });
-    });
-}
-
 
   Widget getImage(String imagePath) {
     if (imagePath.endsWith('.svg')) {
@@ -94,14 +103,17 @@ void playVideo(String videoPath) {
       {
         'image': 'assets/images/ja_poster.png',
         'video': 'assets/video/Ja Morant Dunk.mp4',
+        'text': 'Ja MASSIVE Dunk',
       },
       {
         'image': 'assets/images/Gordon_poster.png',
         'video': 'assets/video/Aaron_Gordon_poster.mp4',
+        'text': 'Gordon insane poster',
       },
       {
         'image': 'assets/images/Carter_poster.png',
         'video': 'assets/video/Vince_Dunk of Death_ .mp4',
+        'text': 'Carters "Dunk of Death"',
       },
     ];
 
@@ -113,10 +125,10 @@ void playVideo(String videoPath) {
           children: [
             Row(
               children: [
-                SvgPicture.asset(
-                  'assets/images/logo.svg',
-                  height: 60,
-                  width: 60,
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 80,
+                  width: 80,
                 ),
                 const SizedBox(width: 10),
                 Text(
@@ -126,8 +138,8 @@ void playVideo(String videoPath) {
               ],
             ),
             IconButton(
-              icon: SvgPicture.asset(
-                'assets/images/settings.svg',
+              icon: Image.asset(
+                'assets/images/settings.png',
                 height: 20,
                 width: 20,
               ),
@@ -145,9 +157,8 @@ void playVideo(String videoPath) {
           Positioned(
             top: MediaQuery.of(context).size.height * 0.1,
             right: 0,
-            child: SvgPicture.asset(
-              'assets/images/blueLine.svg',
-              color: Colors.blue,
+            child: Image.asset(
+              'assets/images/blue_line.png',
             ),
           ),
           SingleChildScrollView(
@@ -165,24 +176,56 @@ void playVideo(String videoPath) {
                     ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color:
-                        const Color.fromARGB(255, 48, 54, 77).withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      "assets/images/ja.jpg",
-                      fit: BoxFit.cover,
-                      height: 170,
-                      width: 310,
+                Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 48, 54, 77)
+                            .withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: hotNewsImages.length,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentHotNewsIndex = index;
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              hotNewsImages[index],
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(hotNewsImages.length, (index) {
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: _currentHotNewsIndex == index ? 12 : 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: _currentHotNewsIndex == index
+                                ? Colors.white
+                                : Colors.grey,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 1),
+                const SizedBox(height: 0.5),
                 const Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Text(
@@ -194,11 +237,11 @@ void playVideo(String videoPath) {
                     ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  height: 90,
+                SizedBox(
+                  height: 130,
                   child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
+                    scrollDirection:
+                        Axis.horizontal, // Горизонтальная прокрутка
                     itemCount: highlights.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
@@ -206,33 +249,87 @@ void playVideo(String videoPath) {
                           playVideo(highlights[index]['video']!);
                         },
                         child: Container(
-                          width: 110,
-                          margin: const EdgeInsets.only(right: 16),
+                          width: 120, // Ширина каждого элемента
+                          margin: const EdgeInsets.only(
+                              right: 16), // Отступ между элементами
                           decoration: BoxDecoration(
                             color: const Color.fromARGB(255, 48, 54, 77)
                                 .withOpacity(0.5),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: getImage(highlights[index]['image']!),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
+                                ),
+                                child: getImage(highlights[index]['image']!),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  highlights[index]['text']!,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
                   ),
                 ),
-                const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 48, 54, 77)
-                          .withOpacity(0.5),
-                    ),
-                    child: ClipRRect(
-                      child: Image.asset(
-                        "assets/images/Live_game.png",
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "LIVE GAME",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 48, 54, 77)
+                              .withOpacity(0.5),
+                        ),
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                              child: Image.asset(
+                                "assets/images/Live_game.png",
+                                height: 160,
+                                width: 650,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                "Milwaukee Bucks vs Denver Nuggets",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -271,17 +368,17 @@ void playVideo(String videoPath) {
                     builder: (context) => const HomePage(title: ''),
                   ),
                 );
-              } else if(index == 1) {
+              } else if (index == 1) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const ProfilePage()),
                 );
-              } else if(index == 2) {
+              } else if (index == 2) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const GamesPage()),
                 );
-              } else if(index == 3) {
+              } else if (index == 3) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const PlayoffPage()),
@@ -294,44 +391,40 @@ void playVideo(String videoPath) {
             items: [
               BottomNavigationBarItem(
                 icon: Padding(
-                  padding: const EdgeInsets.only(bottom: 0),
-                  child: SvgPicture.asset(
-                    'assets/images/home_icon.svg',
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Image.asset(
+                    'assets/images/home_icon.png',
                     height: 30,
-                    color: _currentIndex == 0 ? Colors.white : Colors.grey,
                   ),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Padding(
-                  padding: const EdgeInsets.only(bottom: 0),
-                  child: SvgPicture.asset(
-                    'assets/images/icon_user.svg',
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Image.asset(
+                    'assets/images/people_icon.png',
                     height: 30,
-                    color: _currentIndex == 1 ? Colors.white : Colors.grey,
                   ),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Padding(
-                  padding: const EdgeInsets.only(bottom: 0),
-                  child: SvgPicture.asset(
-                    'assets/images/scoreboard.svg',
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Image.asset(
+                    'assets/images/score_icon.png',
                     height: 30,
-                    color: _currentIndex == 2 ? Colors.white : Colors.grey,
                   ),
                 ),
                 label: '',
               ),
               BottomNavigationBarItem(
                 icon: Padding(
-                  padding: const EdgeInsets.only(bottom: 0),
-                  child: SvgPicture.asset(
-                    'assets/images/standings.svg',
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Image.asset(
+                    'assets/images/playoff_icon.png',
                     height: 30,
-                    color: _currentIndex == 3 ? Colors.white : Colors.grey,
                   ),
                 ),
                 label: '',

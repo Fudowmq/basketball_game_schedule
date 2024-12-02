@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class PlayoffPage extends StatefulWidget {
   const PlayoffPage({super.key});
@@ -18,9 +17,9 @@ class _PlayoffPageState extends State<PlayoffPage> {
         backgroundColor: const Color.fromARGB(255, 36, 40, 58),
         elevation: 0,
         title: const Align(
-          alignment: Alignment.centerLeft, 
+          alignment: Alignment.centerLeft,
           child: Text(
-            'PLAYOFF',  // Изменили текст с PLAU на PLAYOFF
+            'PLAYOFF', // Изменили текст с PLAU на PLAYOFF
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -28,8 +27,8 @@ class _PlayoffPageState extends State<PlayoffPage> {
             ),
           ),
         ),
-        automaticallyImplyLeading: false,  // Убираем стандартную кнопку "назад"
-        centerTitle: false,  // Выключаем центрирование заголовка
+        automaticallyImplyLeading: false, // Убираем стандартную кнопку "назад"
+        centerTitle: false, // Выключаем центрирование заголовка
       ),
       body: Column(
         children: [
@@ -101,9 +100,7 @@ class _PlayoffPageState extends State<PlayoffPage> {
               Navigator.pushNamed(context, '/profile');
             } else if (index == 2) {
               Navigator.pushNamed(context, '/games');
-            } else if (index == 3) {
-
-            }
+            } else if (index == 3) {}
           }
         },
         selectedItemColor: Colors.white,
@@ -111,34 +108,42 @@ class _PlayoffPageState extends State<PlayoffPage> {
         iconSize: 28,
         items: [
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/home_icon.svg',
-              height: 30,
-              color: _currentIndex == 0 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/home_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/icon_user.svg',
-              height: 30,
-              color: _currentIndex == 1 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/people_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/scoreboard.svg',
-              height: 30,
-              color: _currentIndex == 2 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/score_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/standings.svg',
-              height: 30,
-              color: _currentIndex == 3 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/playoff_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,8 +11,7 @@ class ProfilePage extends StatefulWidget {
 class ProfilePageState extends State<ProfilePage> {
   int _currentIndex = 1;
 
-  double positionOffsetX = 0.0;
-  double positionOffsetY = 0.0;
+  String _myTeamImage = 'assets/images/my_team_icon.png';
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +34,8 @@ class ProfilePageState extends State<ProfilePage> {
           Positioned(
             top: MediaQuery.of(context).size.height * 0.1,
             right: 0,
-            child: SvgPicture.asset(
-              'assets/images/blueLine.svg',
-              color: Colors.blue,
+            child: Image.asset(
+              'assets/images/blue_line.png',
             ),
           ),
           Padding(
@@ -108,7 +106,7 @@ class ProfilePageState extends State<ProfilePage> {
                       mainAxisSpacing: 20,
                       children: [
                         _buildProfileOption(
-                            'assets/images/my_team_icon.png', 'My Team'),
+                            _myTeamImage, 'My Team', _onMyTeamTap),
                         _buildProfileOption(
                             'assets/images/my_player_icon.png', 'My Players'),
                         _buildProfileOption(
@@ -128,16 +126,95 @@ class ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileOption(String assetPath, String label) {
-    return GestureDetector(
-      onTap: () {
-        // Логика для обработки нажатия
+  // Обработчик нажатия на 'My Team'
+  void _onMyTeamTap() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color.fromARGB(255, 48, 54, 77).withOpacity(0.9),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            const Text(
+              'Select Your Team',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            // Добавьте ваши команды здесь
+            _buildTeamTile('Atlanta', 'assets/myTeamImages/atlanta.png'),
+            _buildTeamTile('Boston', 'assets/myTeamImages/boston.png'),
+            _buildTeamTile('Brooklyn', 'assets/myTeamImages/brooklyn.png'),
+            _buildTeamTile('Bucks', 'assets/myTeamImages/bucks.png'),
+            _buildTeamTile('Bulls', 'assets/myTeamImages/bulls.png'),
+            _buildTeamTile('Cleveland', 'assets/myTeamImages/cleveland.png'),
+            _buildTeamTile('Clippers', 'assets/myTeamImages/clippers.png'),
+            _buildTeamTile('Dallas', 'assets/myTeamImages/dallas.png'),
+            _buildTeamTile('Denver', 'assets/myTeamImages/denver.png'),
+            _buildTeamTile('Detroit', 'assets/myTeamImages/detroit.png'),
+            _buildTeamTile('Hornets', 'assets/myTeamImages/hornets.png'),
+            _buildTeamTile('Indiana', 'assets/myTeamImages/indiana.png'),
+            _buildTeamTile('Jazz', 'assets/myTeamImages/jazz.png'),
+            _buildTeamTile('Kings', 'assets/myTeamImages/kings.png'),
+            _buildTeamTile('Knicks', 'assets/myTeamImages/knicks.png'),
+            _buildTeamTile('Lakers', 'assets/myTeamImages/lakers.png'),
+            _buildTeamTile('Magic', 'assets/myTeamImages/magic.png'),
+            _buildTeamTile('Memphis', 'assets/myTeamImages/memphis.png'),
+            _buildTeamTile('Miami', 'assets/myTeamImages/miami.png'),
+            _buildTeamTile('Pelicans', 'assets/myTeamImages/pelicans.png'),
+            _buildTeamTile('Portland', 'assets/myTeamImages/portland.png'),
+            _buildTeamTile('Raptors', 'assets/myTeamImages/raptors.png'),
+            _buildTeamTile('Rocket', 'assets/myTeamImages/rocket.png'),
+            _buildTeamTile('Sixers', 'assets/myTeamImages/sixers.png'),
+            _buildTeamTile('Spurs', 'assets/myTeamImages/spurs.png'),
+            _buildTeamTile('Suns', 'assets/myTeamImages/suns.png'),
+            _buildTeamTile('Thunder', 'assets/myTeamImages/thunder.png'),
+            _buildTeamTile('Timberwolves', 'assets/myTeamImages/timberwolves.png'),
+            _buildTeamTile('Warriors', 'assets/myTeamImages/warriors.png'),
+            _buildTeamTile('Wizards', 'assets/myTeamImages/wizards.png'),
+          ],
+        );
       },
+    );
+  }
+
+  // Виджет для команды
+  Widget _buildTeamTile(String teamName, String assetPath) {
+    return ListTile(
+      leading: Image.asset(
+        assetPath,
+        height: 40,
+        width: 40,
+      ),
+      title: Text(
+        teamName,
+        style: const TextStyle(color: Colors.white, fontSize: 18),
+      ),
+      onTap: () {
+        setState(() {
+          _myTeamImage = assetPath; // Установка выбранного изображения
+        });
+        Navigator.pop(context); // Закрытие окна
+      },
+    );
+  }
+
+  Widget _buildProfileOption(String assetPath, String label,
+      [VoidCallback? onTap]) {
+    return GestureDetector(
+      onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Transform.rotate(
-            angle: -0.1, 
+            angle: -0.1,
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -159,11 +236,11 @@ class ProfilePageState extends State<ProfilePage> {
                 ],
               ),
               child: Transform.rotate(
-                angle: 0.1, 
+                angle: 0.1,
                 child: Image.asset(
                   assetPath,
-                  height: 50,
-                  width: 50,
+                  height: 30,
+                  width: 30,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -205,7 +282,7 @@ class ProfilePageState extends State<ProfilePage> {
             if (index == 0) {
               Navigator.pushNamed(context, '/home');
             } else if (index == 1) {
-              
+
             } else if (index == 2) {
               Navigator.pushNamed(context, '/games');
             } else if (index == 3) {
@@ -218,34 +295,42 @@ class ProfilePageState extends State<ProfilePage> {
         iconSize: 28,
         items: [
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/home_icon.svg',
-              height: 30,
-              color: _currentIndex == 0 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/home_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/icon_user.svg',
-              height: 30,
-              color: _currentIndex == 1 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/people_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/scoreboard.svg',
-              height: 30,
-              color: _currentIndex == 2 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/score_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/images/standings.svg',
-              height: 30,
-              color: _currentIndex == 3 ? Colors.white : Colors.grey,
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Image.asset(
+                'assets/images/playoff_icon.png',
+                height: 30,
+              ),
             ),
             label: '',
           ),
