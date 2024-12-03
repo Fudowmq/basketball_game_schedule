@@ -1,5 +1,59 @@
+import 'package:basketball_game_schedule/database/user_profile.dart';
 import 'package:flutter/material.dart';
 
+class UserProfilePage extends StatefulWidget {
+  const UserProfilePage({super.key});
+
+  @override
+  _UserProfilePageState createState() => _UserProfilePageState();
+}
+
+class _UserProfilePageState extends State<UserProfilePage> {
+  String _myTeamImage = 'default_team_image.png';
+  String _myPlayerImage = 'default_player_image.png';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  void _loadUserProfile() async {
+    UserProfile? profile = await DBHelper.getUserProfile();
+    if (profile != null) {
+      setState(() {
+        _myTeamImage = profile.teamImage ?? _myTeamImage;
+        _myPlayerImage = profile.playerImage ?? _myPlayerImage;
+      });
+    }
+  }
+
+  // Сохранение нового профиля пользователя (например, при изменении изображения)
+  void _saveUserProfile() async {
+    UserProfile profile = UserProfile(
+      teamImage: 'new_team_image.png', // Замените на нужный путь
+      playerImage: 'new_player_image.png', // Замените на нужный путь
+    );
+    await DBHelper.saveUserProfile(profile);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('User Profile'),
+      ),
+      body: Column(
+        children: [
+          Image.asset(_myTeamImage), // Отображение изображения команды
+          Image.asset(_myPlayerImage), // Отображение изображения игрока
+          ElevatedButton(
+              onPressed: _saveUserProfile, child: Text('Save Profile')),
+        ],
+      ),
+    );
+  }
+}
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -12,6 +66,7 @@ class ProfilePageState extends State<ProfilePage> {
   int _currentIndex = 1;
 
   String _myTeamImage = 'assets/images/my_team_icon.png';
+  String _myPlayerImage = 'assets/images/my_player_icon.png';
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +163,7 @@ class ProfilePageState extends State<ProfilePage> {
                         _buildProfileOption(
                             _myTeamImage, 'My Team', _onMyTeamTap),
                         _buildProfileOption(
-                            'assets/images/my_player_icon.png', 'My Players'),
+                            _myPlayerImage, 'My Players', _onMyPlayersTap),
                         _buildProfileOption(
                             'assets/images/store_icon.png', 'Store'),
                         _buildProfileOption(
@@ -176,7 +231,8 @@ class ProfilePageState extends State<ProfilePage> {
             _buildTeamTile('Spurs', 'assets/myTeamImages/spurs.png'),
             _buildTeamTile('Suns', 'assets/myTeamImages/suns.png'),
             _buildTeamTile('Thunder', 'assets/myTeamImages/thunder.png'),
-            _buildTeamTile('Timberwolves', 'assets/myTeamImages/timberwolves.png'),
+            _buildTeamTile(
+                'Timberwolves', 'assets/myTeamImages/timberwolves.png'),
             _buildTeamTile('Warriors', 'assets/myTeamImages/warriors.png'),
             _buildTeamTile('Wizards', 'assets/myTeamImages/wizards.png'),
           ],
@@ -190,18 +246,89 @@ class ProfilePageState extends State<ProfilePage> {
     return ListTile(
       leading: Image.asset(
         assetPath,
-        height: 40,
-        width: 40,
+        height: 45,
+        width: 45,
       ),
       title: Text(
         teamName,
         style: const TextStyle(color: Colors.white, fontSize: 18),
       ),
-      onTap: () {
+      onTap: () async {
         setState(() {
-          _myTeamImage = assetPath; // Установка выбранного изображения
+          _myTeamImage = assetPath;
         });
-        Navigator.pop(context); // Закрытие окна
+        // Сохранение выбранной команды в базу данных
+        await DBHelper.saveUserProfile(UserProfile(
+          teamImage: assetPath,
+          playerImage: _myPlayerImage,
+        ));
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  void _onMyPlayersTap() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color.fromARGB(255, 48, 54, 77).withOpacity(0.9),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            const Text(
+              'Select Your Player',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            _buildPlayerTile('LeBron James', 'assets/myPlayerImages/lebron.png'),
+            _buildPlayerTile('Stephen Curry', 'assets/myPlayerImages/curry.png'),
+            _buildPlayerTile('Kevin Durant', 'assets/myPlayerImages/durant.png'),
+            _buildPlayerTile('Luka Dončić', 'assets/myPlayerImages/luka.png'),
+            _buildPlayerTile('Nikola Jokić', 'assets/myPlayerImages/jokic.png'),
+            _buildPlayerTile('Giannis Antetokounmpo','assets/myPlayerImages/antetokounmpo.png'),
+            _buildPlayerTile('Lamelo Ball', 'assets/myPlayerImages/lamelo.png'),
+            _buildPlayerTile('Ja Morant', 'assets/myPlayerImages/morant.png'),
+            _buildPlayerTile('Victor Wembanyama', 'assets/myPlayerImages/wembanyama.png'),
+            _buildPlayerTile('Shai Gilgeous-Alexander', 'assets/myPlayerImages/shai.png'),
+            _buildPlayerTile('James Harden', 'assets/myPlayerImages/harden.png'),
+            _buildPlayerTile('Anthony Edwards', 'assets/myPlayerImages/ant.png'),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildPlayerTile(String playerName, String assetPath) {
+    return ListTile(
+      leading: Image.asset(
+        assetPath,
+        height: 45,
+        width: 45,
+      ),
+      title: Text(
+        playerName,
+        style: const TextStyle(color: Colors.white, fontSize: 18),
+      ),
+      onTap: () async {
+        setState(() {
+          _myPlayerImage = assetPath;
+        });
+        // Сохранение выбранного игрока в базу данных
+        await DBHelper.saveUserProfile(UserProfile(
+          teamImage: _myTeamImage,
+          playerImage: assetPath,
+        ));
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
       },
     );
   }
@@ -216,7 +343,7 @@ class ProfilePageState extends State<ProfilePage> {
           Transform.rotate(
             angle: -0.1,
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16.9),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -239,8 +366,8 @@ class ProfilePageState extends State<ProfilePage> {
                 angle: 0.1,
                 child: Image.asset(
                   assetPath,
-                  height: 30,
-                  width: 30,
+                  height: 40,
+                  width: 40,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -282,7 +409,6 @@ class ProfilePageState extends State<ProfilePage> {
             if (index == 0) {
               Navigator.pushNamed(context, '/home');
             } else if (index == 1) {
-
             } else if (index == 2) {
               Navigator.pushNamed(context, '/games');
             } else if (index == 3) {
