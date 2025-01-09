@@ -1,10 +1,12 @@
 import 'package:basketball_game_schedule/database/user_profile.dart';
 import 'package:flutter/material.dart';
 
+
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _UserProfilePageState createState() => _UserProfilePageState();
 }
 
@@ -28,11 +30,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  // Сохранение нового профиля пользователя (например, при изменении изображения)
   void _saveUserProfile() async {
     UserProfile profile = UserProfile(
-      teamImage: 'new_team_image.png', // Замените на нужный путь
-      playerImage: 'new_player_image.png', // Замените на нужный путь
+      teamImage: 'new_team_image.png', 
+      playerImage: 'new_player_image.png', 
     );
     await DBHelper.saveUserProfile(profile);
   }
@@ -41,14 +42,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Profile'),
+        title: const Text('User Profile'),
       ),
       body: Column(
         children: [
-          Image.asset(_myTeamImage), // Отображение изображения команды
-          Image.asset(_myPlayerImage), // Отображение изображения игрока
+          Image.asset(_myTeamImage),
+          Image.asset(_myPlayerImage),
           ElevatedButton(
-              onPressed: _saveUserProfile, child: Text('Save Profile')),
+              onPressed: _saveUserProfile, child: const Text('Save Profile')),
         ],
       ),
     );
@@ -67,6 +68,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   String _myTeamImage = 'assets/images/my_team_icon.png';
   String _myPlayerImage = 'assets/images/my_player_icon.png';
+  String _username = 'Adilbek';
 
   @override
   Widget build(BuildContext context) {
@@ -102,10 +104,10 @@ class ProfilePageState extends State<ProfilePage> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
+                        const CircleAvatar(
                           radius: 40,
                           backgroundColor: Colors.grey,
                           child: Icon(
@@ -114,12 +116,12 @@ class ProfilePageState extends State<ProfilePage> {
                             size: 40,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Padding(
-                          padding: EdgeInsets.only(left: 8.0),
+                          padding: const EdgeInsets.only(left: 8.0),
                           child: Text(
-                            'Adilbek',
-                            style: TextStyle(
+                            _username,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -130,15 +132,12 @@ class ProfilePageState extends State<ProfilePage> {
                     ),
                     const Spacer(),
                     Transform.translate(
-                      offset: const Offset(-10.0, 22.0),
+                      offset: const Offset(-50.0, 22.0), 
                       child: ElevatedButton(
-                        onPressed: () {
-                          // Логика для кнопки Manage Profile
-                        },
+                        onPressed: () => _showEditUsernameDialog(),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          side:
-                              const BorderSide(color: Colors.white, width: 0.8),
+                          backgroundColor: const Color.fromARGB(255, 36, 40, 58),
+                          side: const BorderSide(color: Colors.white, width: 0.6),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -181,7 +180,93 @@ class ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Обработчик нажатия на 'My Team'
+void _showEditUsernameDialog() {
+  TextEditingController usernameController = TextEditingController(text: _username);
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        backgroundColor: const Color.fromARGB(255, 48, 54, 77),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Edit Username',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: usernameController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 36, 40, 58),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(color: Colors.blue, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _username = usernameController.text;
+                      });
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,  
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+
+                    ),
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+  
+
+
+
+
   void _onMyTeamTap() {
     showModalBottomSheet(
       context: context,
@@ -203,7 +288,6 @@ class ProfilePageState extends State<ProfilePage> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            // Добавьте ваши команды здесь
             _buildTeamTile('Atlanta', 'assets/myTeamImages/atlanta.png'),
             _buildTeamTile('Boston', 'assets/myTeamImages/boston.png'),
             _buildTeamTile('Brooklyn', 'assets/myTeamImages/brooklyn.png'),
@@ -230,9 +314,6 @@ class ProfilePageState extends State<ProfilePage> {
             _buildTeamTile('Sixers', 'assets/myTeamImages/sixers.png'),
             _buildTeamTile('Spurs', 'assets/myTeamImages/spurs.png'),
             _buildTeamTile('Suns', 'assets/myTeamImages/suns.png'),
-            _buildTeamTile('Thunder', 'assets/myTeamImages/thunder.png'),
-            _buildTeamTile(
-                'Timberwolves', 'assets/myTeamImages/timberwolves.png'),
             _buildTeamTile('Warriors', 'assets/myTeamImages/warriors.png'),
             _buildTeamTile('Wizards', 'assets/myTeamImages/wizards.png'),
           ],
@@ -241,7 +322,7 @@ class ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Виджет для команды
+
   Widget _buildTeamTile(String teamName, String assetPath) {
     return ListTile(
       leading: Image.asset(
@@ -409,6 +490,7 @@ class ProfilePageState extends State<ProfilePage> {
             if (index == 0) {
               Navigator.pushNamed(context, '/home');
             } else if (index == 1) {
+
             } else if (index == 2) {
               Navigator.pushNamed(context, '/games');
             } else if (index == 3) {
